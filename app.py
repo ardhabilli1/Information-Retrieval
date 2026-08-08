@@ -1,37 +1,31 @@
-# app.py
-import streamlit as st
 import json
-import os
+import streamlit as st
 
-DATA_PATH = "data/books.json"
-
-st.set_page_config(page_title="Book Search (Scraped via Scrapy)", layout="wide")
+# 1. Judul (Sesuaikan dengan contoh dosen)
 st.title("📚 Book Search (Scraped via Scrapy)")
 
-# Load data
-if os.path.exists(DATA_PATH):
-    with open(DATA_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-else:
-    st.warning("Data belum tersedia. Jalankan crawler terlebih dahulu.")
-    st.stop()
+# Load Data
+with open("data/books.json", "r", encoding="utf-8") as f:
+    books = json.load(f)
 
-# Input pencarian
-query = st.text_input("Cari judul buku:", "")
+# Input Pencarian
+query = st.text_input("Cari..")
 
-# Filter data
+# Filter Data berdasarkan pencarian
 if query:
-    filtered = [item for item in data if query.lower() in item["title"].lower()]
-    st.markdown(f"### ✨ Ditemukan {len(filtered)} hasil")
+    filtered_books = [
+        b for b in books if query.lower() in b.get("title", "").lower()
+    ]
 else:
-    filtered = data
-    st.markdown(f"### ✨ Ditemukan {len(filtered)} hasil")
+    filtered_books = books
 
-# Tampilkan hasil
-for item in filtered:
-    st.markdown(f"[**{item['title']}**]({item['link']})")
+# 2. Tampilan Jumlah Hasil (Gunakan emoji ✨ dan kata "Ditemukan X hasil")
+st.subheader(f"✨ Ditemukan {len(filtered_books)} hasil")
+
+# Tampilkan Daftar Buku
+for book in filtered_books:
+    st.markdown(f"### [{book['title']}]({book['link']})")
     st.markdown(
-        f"Price: `{item['price']}` | Rating: `{item['rating']}` | "
-        f"Availability: {item['availability']} stock"
+        f"**Price:** {book['price']} | **Rating:** {book['rating']} | **Availability:** {book['availability']}"
     )
-    st.markdown("---")
+    st.write("---")
